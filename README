@@ -1,0 +1,9 @@
+This is an instruction on how to run KTGui, created by Zhiwei Jia
+for showing Knight's tour.
+
+Usage: java KTGui m n
+Command line argument m&n to specify the size of the board:
+    m: the row size
+    n: the column size
+    default: if not specified, the size is the standard board (8x8)
+
