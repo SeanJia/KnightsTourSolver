@@ -164,7 +164,7 @@ public class KnightTour {
 	}
 
 	// main thread waits until we have found a tour
-	while (hasFoundTour) {}
+	while (!hasFoundTour) {}
 	
 	// return whether it has found a tour
 	return hasFoundTour;
