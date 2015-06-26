@@ -163,13 +163,8 @@ public class KnightTour {
 	    threadArr[1].start();
 	}
 
-	// put the main thread to sleep until has found a tour
-	try {
-	    while(!hasFoundTour)
-		Thread.sleep(200);
-	} catch (InterruptedException e) {
-	    e.printStackTrace();
-	}
+	// main thread waits until we have found a tour
+	while (hasFoundTour) {}
 	
 	// return whether it has found a tour
 	return hasFoundTour;
