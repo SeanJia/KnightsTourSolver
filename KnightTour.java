@@ -4,6 +4,7 @@
  */
 
 import java.util.ArrayList;
+
 /**
  * Class Name: KnightTour
  * Description: a class to use backtracking algorithm with multithreading
@@ -20,6 +21,7 @@ public class KnightTour {
     private MyDeque<Cell> tour2;
     private MyDeque<Cell> tour3;
     private MyDeque<Cell> tour4;
+    private MyDeque<Cell> tour5;
     
     // some boards for multi-threading
     private Cell[][] board;
@@ -27,6 +29,7 @@ public class KnightTour {
     private Cell[][] board2;
     private Cell[][] board3;
     private Cell[][] board4;
+    private Cell[][] board5;
     
     // whether the board is a square matrix
     private boolean square;
@@ -36,7 +39,7 @@ public class KnightTour {
     private int iniCol;
     
     // multiple threads
-    private Thread[] threadArr = new Thread[4];
+    private Thread[] threadArr = new Thread[5];
     
     // a value to tell whether the tour is found
     private volatile boolean hasFoundTour;
@@ -48,21 +51,23 @@ public class KnightTour {
      */
     public KnightTour(int rowSize, int colSize) {
 	
-	// set values of the board
-	numCell = rowSize*colSize;
-	if (rowSize == colSize)
-	    square = true;
+    	// set values of the board
+    	numCell = rowSize*colSize;
+    	if (rowSize == colSize)
+    		square = true;
 	
-	// initialize objects 
-	tour1 = new MyDeque<>(numCell);
-	tour2 = new MyDeque<>(numCell);
-	tour3 = new MyDeque<>(numCell);
-	tour4 = new MyDeque<>(numCell);
-	board = new Cell[rowSize][colSize];
-        board1 = new Cell[rowSize][colSize];
-        board2 = new Cell[rowSize][colSize];
-        board3 = new Cell[rowSize][colSize];
-        board4 = new Cell[rowSize][colSize];
+    	// initialize objects 
+    	tour1 = new MyDeque<>(numCell);
+    	tour2 = new MyDeque<>(numCell);
+    	tour3 = new MyDeque<>(numCell);
+    	tour4 = new MyDeque<>(numCell);
+    	tour5 = new MyDeque<>(numCell);
+    	board = new Cell[rowSize][colSize];
+    	board1 = new Cell[rowSize][colSize];
+    	board2 = new Cell[rowSize][colSize];
+    	board3 = new Cell[rowSize][colSize];
+    	board4 = new Cell[rowSize][colSize];
+    	board5 = new Cell[rowSize][colSize];
         
         // initialize boards
         for (int i = 0; i < rowSize; i++) {
@@ -81,6 +86,10 @@ public class KnightTour {
             for (int j = 0; j < colSize; j++) 
         	board4[i][j] = new Cell(i, j);
         }
+        for (int i = 0; i < rowSize; i++) {
+            for (int j = 0; j < colSize; j++) 
+        	board5[i][j] = new Cell(i, j);
+        }
     }
     
     /**
@@ -92,30 +101,31 @@ public class KnightTour {
      * @return an ArrayList for the Cells
      */
     public ArrayList<Cell> getReachable(int row, int col, int thread) {
-	ArrayList<Cell> result = new ArrayList<>(); 
+    	ArrayList<Cell> result = new ArrayList<>(); 
 	
-	// nested loop to search through all the possible positions
-	for (int i = -2; i <= 2; i++) {
-	    for (int j = -2; j <= 2; j++) {
+    	// nested loop to search through all the possible positions
+    	for (int i = -2; i <= 2; i++) {
+    		for (int j = -2; j <= 2; j++) {
 		
-		// if within scope of the board, add it to the list
-		if (Math.abs(i)+Math.abs(j) == 3 && row+i < board.length 
-	            && row+i >= 0 && col+j >= 0 && col+j < board[0].length) {
-		    
-		    // support the multi-threading
-		    switch (thread) {
-			case 1: result.add(board1[row+i][col+j]); break;
-			case 2: result.add(board2[row+i][col+j]); break;
-			case 3: result.add(board3[row+i][col+j]); break;
-			case 4: result.add(board4[row+i][col+j]); break;
+    			// if within scope of the board, add it to the list
+    			if (Math.abs(i)+Math.abs(j) == 3 && row+i < board.length 
+    					&& row+i >= 0 && col+j >= 0 && col+j < board[0].length) {		    
+    				
+    				// support the multi-threading
+    				switch (thread) {
+    					case 1: result.add(board1[row+i][col+j]); break;
+    					case 2: result.add(board2[row+i][col+j]); break;
+    					case 3: result.add(board3[row+i][col+j]); break;
+    					case 4: result.add(board4[row+i][col+j]); break;
+    					case 5: result.add(board5[row+i][col+j]); break;
 			
-		    }
-		}
-	    }
-	}
+    				}
+    			}
+    		}
+    	}
 	
-	// return the result
-	return result;
+    	// return the result
+    	return result;
     }
     
     /**
@@ -126,48 +136,50 @@ public class KnightTour {
      */
     public boolean tour(int iniRow, int iniCol) {
 	
-	// set the relevant values
-	this.iniRow = iniRow;
-	this.iniCol = iniCol;
+    	// set the relevant values
+    	this.iniRow = iniRow;
+    	this.iniCol = iniCol;
 	
-	// initialize boards
-	Cell ini1 = board1[iniRow][iniCol];
-	tour1.addBack(ini1);
-	ini1.visited = true;
-	Cell ini2 = board2[board.length-1-iniRow][board[0].length-1-iniCol];
-	tour2.addBack(ini2);
-	ini2.visited = true;
+    	// initialize boards
+    	Cell ini1 = board1[iniRow][iniCol];
+    	tour1.addBack(ini1);
+    	ini1.visited = true;
+    	Cell ini2 = board2[board.length-1-iniRow][board[0].length-1-iniCol];
+    	tour2.addBack(ini2);
+    	ini2.visited = true;
 	
-	// the square case
-	if (square) {
-	    Cell ini3 = board3[iniCol][iniRow];
-	    tour3.addBack(ini3);
-	    ini3.visited = true;
-	    Cell ini4 = board4[board.length-1-iniCol][board[0].length-1-iniRow];
-	    tour4.addBack(ini4);
-	    ini4.visited = true;
-	}
+    	// the square case
+    	if (square) {
+    		Cell ini3 = board3[iniCol][iniRow];
+    		tour3.addBack(ini3);
+    		ini3.visited = true;
+    		Cell ini4 = board4[board.length-1-iniCol][board[0].length-1-iniRow];
+    		tour4.addBack(ini4);
+    		ini4.visited = true;
+    		Cell ini5 = board5[board.length-1-iniRow][iniCol];
+    		tour5.addBack(ini5);
+    		ini5.visited = true;
+    	}
 	
-	// create threads to find such a tour
-	// the square case
-	if (square) {
-	    for (int i = 0; i < 4; i++) 
-		threadArr[i] = new Thread(new FindingTask(i));
-	    for (int i = 0; i < 4; i++) {
-		threadArr[i].start();
-	    }
-	} else {
-	    threadArr[0] = new Thread(new FindingTask(0));
-	    threadArr[1] = new Thread(new FindingTask(1));
-	    threadArr[0].start();
-	    threadArr[1].start();
-	}
+    	// create threads to find such a tour
+    	// the square case
+    	if (square) {
+    		for (int i = 0; i < 5; i++) 
+    			threadArr[i] = new Thread(new FindingTask(i));
+    		for (int i = 0; i < 5; i++) 
+    			threadArr[i].start();
+    	} else {
+    		threadArr[0] = new Thread(new FindingTask(0));
+    		threadArr[1] = new Thread(new FindingTask(1));
+    		threadArr[0].start();
+    		threadArr[1].start();
+    	}
 
-	// main thread waits until we have found a tour
-	while (!hasFoundTour) {}
+    	// main thread waits until we have found a tour
+    	while (!hasFoundTour) { /* do nothing */ }
 	
-	// return whether it has found a tour
-	return hasFoundTour;
+    	// return whether it has found a tour
+    	return hasFoundTour;
     }
     
     /**
@@ -181,85 +193,89 @@ public class KnightTour {
      */
     private boolean tour(int row, int col, int stepToGo, int thread) {
 	
-	// stop the finding of other threads if one has found a tour
-	if (hasFoundTour)
-	    return true;
+    	// stop the finding of other threads if one has found a tour
+    	if (hasFoundTour)
+    		return true;
 	
-	// for the last step, success!
-	if (stepToGo == 0)
-	    return true;
+    	// for the last step, success!
+    	if (stepToGo == 0)
+    		return true;
 	
-	// backtracking algorithm
-	ArrayList<Cell> currArr = getReachable(row, col, thread); 
-	int i = 0;
-	while (i < currArr.size()) {
-	    Cell curr = currArr.get(i);
-	    if (!curr.visited) {
+    	// backtracking algorithm
+    	ArrayList<Cell> currArr = getReachable(row, col, thread); 
+    	int i = 0;
+    	while (i < currArr.size()) {
+    		Cell curr = currArr.get(i);
+    		if (!curr.visited) {
 		
-		// add the current step; support multi-threading
-		switch (thread) {
-		    case 1: tour1.addBack(curr); break;
-		    case 2: tour2.addBack(curr); break;
-		    case 3: tour3.addBack(curr); break;
-		    case 4: tour4.addBack(curr); break;
-		}
-		curr.visited = true;
-	    } else {
-		i++;
-		continue;
-	    }
+    			// add the current step; support multi-threading
+    			switch (thread) {
+    				case 1: tour1.addBack(curr); break;
+    				case 2: tour2.addBack(curr); break;
+    				case 3: tour3.addBack(curr); break;
+    				case 4: tour4.addBack(curr); break;
+    				case 5: tour5.addBack(curr); break;
+
+    			}
+    			curr.visited = true;
+    		} else {
+    			i++;
+    			continue;
+    		}
 	    
-	    // recursive call
-	    if (!tour(curr.row, curr.col, --stepToGo, thread)) {
-		stepToGo++;
-		curr.visited = false;
-		i++;
+    		// recursive call
+    		if (!tour(curr.row, curr.col, --stepToGo, thread)) {
+    			stepToGo++;
+    			curr.visited = false;
+    			i++;
 		
-		// if not succeed, remove the current step
-		// support multi-threading
-		switch (thread) {
-		    case 1: tour1.removeBack(); break;
-		    case 2: tour2.removeBack(); break;
-		    case 3: tour3.removeBack(); break;
-		    case 4: tour4.removeBack(); break;
-		}
+    			// if not succeed, remove the current step
+    			// support multi-threading
+    			switch (thread) {
+    				case 1: tour1.removeBack(); break;
+    				case 2: tour2.removeBack(); break;
+    				case 3: tour3.removeBack(); break;
+    				case 4: tour4.removeBack(); break;
+    				case 5: tour5.removeBack(); break;
+    			}
 		
-		// and then try another direction for the current step
-		continue;
-	    } else
-		return true;    // succeed!
-	}
+    			// and then try another direction for the current step
+    			continue;
+    		} else {
+    			return true;    // succeed!
+    		}
+    	}
 	
-	// as i == currArr.size(), we run out of our choice, 
-	// and so no solution exists, we get back for another try
-	return false;	
+    	// as i == currArr.size(), we run out of our choice, 
+    	// and so no solution exists, we get back for another try
+    	return false;	
     }
     
     /**
      * An inner class for the Cell
      */
     class Cell {
-	int row;
-	int col;
-	boolean visited;
+    	int row;
+    	int col;
+    	boolean visited;
 	
-	/**
-	 * Construtor for a cell
-	 * @param row
-	 * @param col
-	 */
-	public Cell(int row, int col) {
-	    this.row = row;
-	    this.col = col;
-	}
+    	/**
+    	 * Construtor for a cell
+    	 * @param row
+    	 * @param col
+    	 */
+    	public Cell(int row, int col) {
+    		this.row = row;
+    		this.col = col;
+    	}
 	
-	@Override
-	/**
-	 * the toString method
-	 */
-	public String toString() {
-	    return row + " " + col;
-	}
+    	@Override
+    	/**
+    	 * the toString method
+    	 */
+    	public String toString() {
+    		return row + " " + col;
+    	}
     }
     
     /**
@@ -267,64 +283,75 @@ public class KnightTour {
      */
     class FindingTask implements Runnable {
 	
-	// a value indicating which task it is
-	int taskID;
+    	// a value indicating which task it is
+    	int taskID;
 	
-	/**
-	 * Constructor for a task object
-	 * @param taskID its ID
-	 */
-	FindingTask(int taskID) {
-	    this.taskID = taskID;
-	}
+    	/**
+    	 * Constructor for a task object
+    	 * @param taskID its ID
+    	 */
+    	FindingTask(int taskID) {
+    		this.taskID = taskID;
+    	}
 	
-	@Override
+    	@Override
         /**
-         * to run the task, where we search via four options of direction
-         * support multi-threading
+         * to run the task, where we search via five options of direction
+         * in order to support multi-threading
          */
-	public void run() {
+    	public void run() {
 	    
-	    // the first direction
-	    if (taskID == 0) {
-		if (tour(iniRow, iniCol, numCell - 1, 1)) 
-		    setTour(tour1); // set the tour this thread found 
-	    }
+    		// the first direction
+    		if (taskID == 0) {
+    			if (tour(iniRow, iniCol, numCell - 1, 1)) 
+    				setTour(tour1); // set the tour this thread found 
+    		}
 	    
-	    // the second one
-	    if (taskID == 1) {
-		if (tour(board.length-1-iniRow,board[0].length-1-iniCol,
-			numCell-1,2)) {
+    		// the second one
+    		if (taskID == 1) {
+    			if (tour(board.length-1-iniRow,board[0].length-1-iniCol,
+    					numCell-1,2)) {
 		    
-		    // rotate and set the tour this thread found
-		    rotate(tour2);
-		    setTour(tour2);
-		}
-	    }
+    				// rotate and set the tour this thread found
+    				rotate(tour2);
+    				setTour(tour2);
+    			}
+    		}
 	    
-	    // the third one; work only if square board
-	    if (taskID == 2 && square) {
-		if (tour(iniCol, iniRow, numCell - 1, 3)) {
+    		// the third one; work only if square board
+    		if (taskID == 2 && square) {
+    			if (tour(iniCol, iniRow, numCell - 1, 3)) {
 		    
-		    // reflect and set the tour this thread found
-		    reflect(tour3);
-		    setTour(tour3);
-		}
-	    }
+    				// reflect and set the tour this thread found
+    				reflect(tour3);
+    				setTour(tour3);
+    			}
+    		}
 	    
-	    // the fourth one; only work if square board
-	    if (taskID == 3 && square) {
-		if (tour(board.length-1-iniCol,board[0].length-1-iniRow,
-			numCell-1,4)) {
+    		// the fourth one; only work if square board
+    		if (taskID == 3 && square) {
+    			if (tour(board.length-1-iniCol,board[0].length-1-iniRow,
+    					numCell-1,4)) {
 		    
-		    // rotate and reflect and then set the tour
-		    // that this thread found
-		    rotate(tour4);
-		    reflect(tour4);
-		    setTour(tour4);
-		}
-	    }
-	}
+    				// rotate and reflect and then set the tour
+    				// that this thread found
+    				rotate(tour4);
+    				reflect(tour4);
+    				setTour(tour4);
+    			}
+    		}
+	    
+    		// the fifth one; only work if square board
+    		if (taskID == 4 && square) {
+    			if (tour(board.length-1-iniRow,iniCol,numCell-1,5)) {
+
+    				// use mirror() to modify the tour's step list 
+    				// that this thread found
+    				mirror(tour5);
+    				setTour(tour5);
+    			}
+    		}
+    	}
     }
     
     /**
@@ -332,7 +359,7 @@ public class KnightTour {
      * @return tour
      */
     public MyDeque<Cell> getTour() {
-	return tour;
+    	return tour;
     }
     
     /**
@@ -340,7 +367,7 @@ public class KnightTour {
      * @return number of cells
      */
     public int getNumCell() {
-	return numCell;
+    	return numCell;
     }
     
     /**
@@ -361,13 +388,25 @@ public class KnightTour {
      * @param candidate the list to be reflected
      */
     private void reflect(MyDeque<Cell> candidate) {
-	for (int i = 0; i < numCell; i++) {
-	    Cell curr = candidate.removeBack();
-	    int temp = curr.row;
-	    curr.row = curr.col;
-	    curr.col = temp;
-	    candidate.addFront(curr);
-	}
+    	for (int i = 0; i < numCell; i++) {
+    		Cell curr = candidate.removeBack();
+    		int temp = curr.row;
+    		curr.row = curr.col;
+    		curr.col = temp;
+    		candidate.addFront(curr);
+    	}
+    }
+    
+    /**
+     * Helper method to mirror a tour's step list vertically
+     * @param candidate the list to be made a mirror
+     */
+    private void mirror(MyDeque<Cell> candidate) {
+    	for (int i = 0; i < numCell; i++) {
+    		Cell curr = candidate.removeBack();
+    		curr.row = board.length-1-curr.row;
+    		candidate.addFront(curr);
+    	}
     }
     
     /**
@@ -377,10 +416,10 @@ public class KnightTour {
      * @param tour the found tour
      */
     private synchronized void setTour(MyDeque<Cell> tour) {
-	if (!hasFoundTour) 
+    	if (!hasFoundTour) 
 	    this.tour = tour;
 	
-	// indicate that this program has found a tour
-	hasFoundTour = true;
-    }
+    	// indicate that this program has found a tour
+    	hasFoundTour = true;
+    }	
 }
