@@ -34,11 +34,11 @@ import javafx.stage.Stage;
 import javafx.util.Duration;
 
 /**
- * Class Name: KTGui
+ * Class Name: KTSolver
  * Description: a GUI class for finding Knight's Tour, a version for
  *              Java desktop applications
  */
-public class KTGui extends Application {
+public class KTSolver extends Application {
 
     // some value relevant to the board
     private int rowSize;
